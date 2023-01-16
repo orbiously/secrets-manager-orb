@@ -1,0 +1,103 @@
+description: >
+    This command retrieves the list of projects, then searches projects for environment variables,
+    project-level API tokens, SSH keys, as well as, contexts for environment variables.
+parameters:
+  vcs:
+    description: |
+       The VCS the organization is in.
+    type: enum
+    enum: ["github", "bitbucket", "gitlab"]
+    default: "github"
+
+  org-name:
+    description: |
+       The name of the organization you want to search secrests in.
+    type: string
+  
+  circle-token:
+    description: |
+        Name of the environment variable containing the CircleCI personal API token.
+        It is strongly advised to store this environment variable in a tightly restricted context.
+    type: env_var_name
+    default: CIRCLE_TOKEN
+
+  search-projects-env-vars:
+    description: |
+        Whether or not to search for environment variables in projects.
+    type: boolean
+    default: true
+
+  search-projects-api-tokens:
+    description: |
+        Whether or not to search for API tokens in projects.
+    type: boolean
+    default: true
+  
+  search-projects-ssh-keys:
+    description: |
+        Whether or not to search for SSH keys in projects.
+    type: boolean
+    default: true
+
+  search-contexts-env-vars:
+    description: |
+        Whether or not to search for environment variables in contexts.
+    type: boolean
+    default: true
+
+steps:
+  - run:
+      environment:
+        PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+        PARAM_ORG_NAME: << parameters.org-name >>
+      name: Checking requirements
+      command: <<include(scripts/check.sh)>>
+
+  - jq/install
+
+  - run:
+      environment:
+        PARAM_VCS: << parameters.vcs >>
+        PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+        SCRIPT_GET_PROJECTS: << include(scripts/get-projects.sh) >>
+        SCRIPT_GET_PROJECTS_GITHUB: << include(scripts/github/get-projects.sh) >>
+        SCRIPT_GET_PROJECTS_BITBUCKET: << include(scripts/bitbucket/get-projects.sh) >>
+        SCRIPT_GET_PROJECTS_GITLAB: << include(scripts/gitlab/get-projects.sh) >>
+      name: Listing organization projects
+      command: <<include(scripts/vcs/list.sh)>>
+
+  - when:
+      condition: << parameters.search-projects-env-vars >>
+      steps:
+        - run:
+            environment:
+              PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+            name: Searching for environment variables in projects
+            command: <<include(scripts/projects/env-vars.sh)>>
+
+  - when:
+      condition: << parameters.search-projects-api-tokens >>
+      steps:
+        - run:
+            environment:
+              PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+            name: Searching for project-level API tokens
+            command: <<include(scripts/projects/api-tokens.sh)>>
+
+  - when:
+      condition: << parameters.search-projects-ssh-keys >>
+      steps:
+        - run:
+            environment:
+              PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+            name: Searching for SSH keys in projects
+            command: <<include(scripts/projects/ssh-keys.sh)>>
+
+  - when:
+      condition: << parameters.search-contexts-env-vars >>
+      steps:
+        - run:
+            environment:
+              PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+            name: Searching for environment variables in organization contexts
+            command: <<include(scripts/contexts/env-vars.sh)>>
