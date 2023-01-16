@@ -49,6 +49,7 @@ steps:
   - run:
       environment:
         PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+        PARAM_VCS: << parameters.vcs >>
         PARAM_ORG_NAME: << parameters.org-name >>
       name: Checking requirements
       command: <<include(scripts/check.sh)>>
@@ -59,6 +60,7 @@ steps:
       environment:
         PARAM_VCS: << parameters.vcs >>
         PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+        PARAM_ORG_NAME: << parameters.org-name >>
         SCRIPT_GET_PROJECTS: << include(scripts/get-projects.sh) >>
         SCRIPT_GET_PROJECTS_GITHUB: << include(scripts/github/get-projects.sh) >>
         SCRIPT_GET_PROJECTS_BITBUCKET: << include(scripts/bitbucket/get-projects.sh) >>
@@ -72,6 +74,8 @@ steps:
         - run:
             environment:
               PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+              PARAM_VCS: << parameters.vcs >>
+              PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for environment variables in projects
             command: <<include(scripts/projects/env-vars.sh)>>
 
@@ -81,6 +85,8 @@ steps:
         - run:
             environment:
               PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+              PARAM_VCS: << parameters.vcs >>
+              PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for project-level API tokens
             command: <<include(scripts/projects/api-tokens.sh)>>
 
@@ -90,6 +96,8 @@ steps:
         - run:
             environment:
               PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+              PARAM_VCS: << parameters.vcs >>
+              PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for SSH keys in projects
             command: <<include(scripts/projects/ssh-keys.sh)>>
 
@@ -99,5 +107,7 @@ steps:
         - run:
             environment:
               PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
+              PARAM_VCS: << parameters.vcs >>
+              PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for environment variables in organization contexts
             command: <<include(scripts/contexts/env-vars.sh)>>
