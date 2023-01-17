@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#### The scripts for GitHub and Bitbucket are identical. The reason they are duplicated is to facilitate maintenance.
+#### If there are future changes in the GitHub integration that are not implemented in the Bitbucket one (or vice-versa),
+#### it'll be easier to modify only one script to update the orb.
+
 REPOS_PAGE=1
 echo -e "Fetching repositories - Page #$REPOS_PAGE\n" | tee -a fetch-projects.log
 
