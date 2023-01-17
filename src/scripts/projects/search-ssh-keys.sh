@@ -13,7 +13,7 @@ while read PROJECT
     PROJECT_FILENAME="$(echo $PROJECT_NAME | sed -r 's/ +/-spaces-/')"
     ###########################################################################################################################
 
-    curl -s -G "https://circleci.com/api/v2/project/$PROJECT_SLUG/checkout-key" -H "circle-token: $CIRCLECI_API_TOKEN" > project-checkout-keys-API-response.json
+    curl -s -G "https://circleci.com/api/v2/project/$PROJECT_SLUG/checkout-key" -H "circle-token: $CIRCLE_TOKEN" > project-checkout-keys-API-response.json
       if [ $(jq '.items|length' project-checkout-keys-API-response.json) -gt 0 ]; then
         jq '.items' project-checkout-keys-API-response.json > checkout-keys-$PROJECT_FILENAME.json
         echo "$(jq --arg PROJECT "$PROJECT" '(.projects[] | select(.name == "'"$PROJECT"'") | .checkout_keys) |= . + input' all-projects-report.json checkout-keys-$PROJECT_FILENAME.json)" > all-projects-report.json

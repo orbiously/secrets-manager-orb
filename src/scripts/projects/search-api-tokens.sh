@@ -12,7 +12,7 @@ while read PROJECT
     PROJECT_FILENAME="$(echo $PROJECT_NAME | sed -r 's/ +/-spaces-/')"
     ###########################################################################################################################
 
-    curl -s -G "https://circleci.com/api/v1.1/project/$PROJECT_SLUG/token" -H "circle-token: $CIRCLECI_API_TOKEN" > project-tokens-$PROJECT_FILENAME.json
+    curl -s -G "https://circleci.com/api/v1.1/project/$PROJECT_SLUG/token" -H "circle-token: $CIRCLE_TOKEN" > project-tokens-$PROJECT_FILENAME.json
       if [ $(jq '.|length' project-tokens-$PROJECT_FILENAME.json) -gt 0 ]; then
         echo "$(jq --arg PROJECT "$PROJECT" '(.projects[] | select(.name == "'"$PROJECT"'") | .project_api_tokens) |= . + input' all-projects-report.json project-tokens-$PROJECT_FILENAME.json)" > all-projects-report.json
         echo -e "Project $PROJECT has $(jq '.|length' project-tokens-$PROJECT_FILENAME.json) project tokens --> https://app.circleci.com/settings/project/$PROJECT_SLUG/api \n" | tee -a projects-api-tokens.log

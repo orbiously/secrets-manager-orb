@@ -14,7 +14,7 @@ while read PROJECT
 
     ENV_VARS_PAGE=1
     
-    curl -s -G "https://circleci.com/api/v2/project/$PROJECT_SLUG/envvar" -H "circle-token: $CIRCLECI_API_TOKEN" > project-env-vars-API-response.json
+    curl -s -G "https://circleci.com/api/v2/project/$PROJECT_SLUG/envvar" -H "circle-token: $CIRCLE_TOKEN" > project-env-vars-API-response.json
 
     PAGE_TOKEN=$(jq -r '.next_page_token' project-env-vars-API-response.json)
 
@@ -30,7 +30,7 @@ while read PROJECT
       while [[ "$PAGE_TOKEN" != "null" ]]
       do
         ((ENV_VARS_PAGE++))
-        curl -s -G "https://circleci.com/api/v2/project/$PROJECT_SLUG/envvar&page-token=$PAGE_TOKEN" -H "circle-token: $CIRCLECI_API_TOKEN" > project-env-vars-API-response.json
+        curl -s -G "https://circleci.com/api/v2/project/$PROJECT_SLUG/envvar&page-token=$PAGE_TOKEN" -H "circle-token: $CIRCLE_TOKEN" > project-env-vars-API-response.json
         jq '.items' project-env-vars-API-response.json  >> project-env-vars-$PROJECT_FILENAME.json
         PAGE_TOKEN=$(jq -r '.next_page_token' project-env-vars-API-response.json)
       done

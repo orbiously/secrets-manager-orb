@@ -8,7 +8,7 @@ REPOS_PAGE=1
 echo -e "Fetching repositories - Page #$REPOS_PAGE\n" | tee -a fetch-projects.log
 
 #### The response from the below endpoint will also include 'archived' repos.
-curl -s -G "https://circleci.com/api/v1.1/user/repos/$VCS_SLUG?page=$REPOS_PAGE&per-page=100" -H "Circle-Token: $CIRCLECI_API_TOKEN" > repos-list-page-$REPOS_PAGE.json
+curl -s -G "https://circleci.com/api/v1.1/user/repos/$VCS_SLUG?page=$REPOS_PAGE&per-page=100" -H "Circle-Token: $CIRCLE_TOKEN" > repos-list-page-$REPOS_PAGE.json
 jq -r --arg PARAM_ORG_NAME "$PARAM_ORG_NAME" '.[]|select(.owner.login == $PARAM_ORG_NAME)|.name' repos-list-page-$REPOS_PAGE.json > repos-list.txt
 
 
@@ -17,7 +17,7 @@ if [ $(jq 'length' repos-list-page-$REPOS_PAGE.json) -eq 100 ]; then
     do
     ((REPOS_PAGE++))
     echo -e "Fetching repositories - Page #$REPOS_PAGE\n" | tee -a fetch-projects.log
-    curl -s -G "https://circleci.com/api/v1.1/user/repos/$VCS_SLUG?page=$REPOS_PAGE&per-page=100" -H "Circle-Token: $CIRCLECI_API_TOKEN" > repos-list-page-$REPOS_PAGE.json
+    curl -s -G "https://circleci.com/api/v1.1/user/repos/$VCS_SLUG?page=$REPOS_PAGE&per-page=100" -H "Circle-Token: $CIRCLE_TOKEN" > repos-list-page-$REPOS_PAGE.json
     jq -r --arg PARAM_ORG_NAME "$PARAM_ORG_NAME" '.[]|select(.owner.login == $PARAM_ORG_NAME)|.name' repos-list-page-$REPOS_PAGE.json >> repos-list.txt
   done
 fi
@@ -27,7 +27,7 @@ fi
 while read REPO_NAME
   do
     echo "Checking if \'$REPO_NAME\' is or ever was a CircleCI project..." | tee -a fetch-projects.log
-    curl -s -G "https://circleci.com/api/v1.1/project/$ORG_SLUG/$REPO_NAME/settings" -H "circle-token: $CIRCLECI_API_TOKEN" > project-settings-API-response.json
+    curl -s -G "https://circleci.com/api/v1.1/project/$ORG_SLUG/$REPO_NAME/settings" -H "circle-token: $CIRCLE_TOKEN" > project-settings-API-response.json
     if [ $(jq '.branches|length' project-settings-API-response.json) -gt 0 ]; then
       echo -e "\n\'$REPO_NAME\' is a current or past CircleCI project under the \'$PARAM_ORG_NAME\' organization. \n"  | tee -a fetch-projects.log
 
