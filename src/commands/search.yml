@@ -61,12 +61,11 @@ steps:
         PARAM_VCS: << parameters.vcs >>
         PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
         PARAM_ORG_NAME: << parameters.org-name >>
-        SCRIPT_GET_PROJECTS: << include(scripts/get-projects.sh) >>
-        SCRIPT_GET_PROJECTS_GITHUB: << include(scripts/github/get-projects.sh) >>
-        SCRIPT_GET_PROJECTS_BITBUCKET: << include(scripts/bitbucket/get-projects.sh) >>
-        SCRIPT_GET_PROJECTS_GITLAB: << include(scripts/gitlab/get-projects.sh) >>
+        SCRIPT_GET_PROJECTS_GITHUB: << include(scripts/github/get-github-projects.sh) >>
+        SCRIPT_GET_PROJECTS_BITBUCKET: << include(scripts/bitbucket/get-bitbucket-projects.sh) >>
+        SCRIPT_GET_PROJECTS_GITLAB: << include(scripts/gitlab/get-gitlab-projects.sh) >>
       name: Listing organization projects
-      command: <<include(scripts/vcs/list.sh)>>
+      command: <<include(scripts/get-projects.sh)>>
 
   - when:
       condition: << parameters.search-projects-env-vars >>
