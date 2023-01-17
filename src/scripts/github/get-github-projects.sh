@@ -31,6 +31,11 @@ while read REPO_NAME
     if [ $(jq '.branches|length' project-settings-API-response.json) -gt 0 ]; then
       echo -e "\n\'$REPO_NAME\' is a current or past CircleCI project under the \'$PARAM_ORG_NAME\' organization. \n"  | tee -a fetch-projects.log
 
+      #### This is only necessary for the case of GitLab organizations, where the value of PROJECT_NAME can contain spaces.
+      #### Using the same approach for all VCS allows us to have unique 'search' scripts, rather than distinct VCS-specific ones.
+      PROJECT_FILENAME="$(echo $PROJECT_NAME | sed -r 's/ +/-spaces-/')"
+      ###########################################################################################################################
+
       #### These files will be used to search Additional SSH keys and integrations-related settings later in the script.
       cat project-settings-API-response.json > project-settings-API-response-$PROJECT_NAME.json
       #### Keeping them so we don't make the same API call again for each project.
