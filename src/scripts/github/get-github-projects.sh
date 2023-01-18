@@ -12,8 +12,8 @@ curl -s -G "https://circleci.com/api/v1.1/user/repos/$VCS_SLUG?page=$REPOS_PAGE&
 jq -r --arg PARAM_ORG_NAME "$PARAM_ORG_NAME" '.[]|select(.owner.login == $PARAM_ORG_NAME)|.name' repos-list-page-$REPOS_PAGE.json > repos-list.txt
 
 
-if [ $(jq 'length' repos-list-page-$REPOS_PAGE.json) -eq 100 ]; then
-  while [ $(jq 'length' repos-list-page-$REPOS_PAGE.json) -eq 100 ]
+if [[ $(jq 'length' repos-list-page-$REPOS_PAGE.json) -eq 100 ]]; then
+  while [[ $(jq 'length' repos-list-page-$REPOS_PAGE.json) -eq 100 ]]
     do
     ((REPOS_PAGE++))
     echo -e "Fetching repositories - Page #$REPOS_PAGE\n" | tee -a fetch-projects.log
@@ -24,27 +24,22 @@ fi
 
 #### Identifying which of the retrieved repos are or ever were a CircleCI project.
 #### If CircleCI has no knowledge of any branch in a repo, then it isn't and has never been a CircleCI project.
-while read REPO_NAME
+while read -r REPO_NAME
   do
-    echo "Checking if \'$REPO_NAME\' is or ever was a CircleCI project..." | tee -a fetch-projects.log
+    echo -e "Checking if '$REPO_NAME' is or ever was a CircleCI project..." | tee -a fetch-projects.log
     curl -s -G "https://circleci.com/api/v1.1/project/$ORG_SLUG/$REPO_NAME/settings" -H "circle-token: $CIRCLE_TOKEN" > project-settings-API-response.json
-    if [ $(jq '.branches|length' project-settings-API-response.json) -gt 0 ]; then
-      echo -e "\n\'$REPO_NAME\' is a current or past CircleCI project under the \'$PARAM_ORG_NAME\' organization. \n"  | tee -a fetch-projects.log
-
-      #### This is only necessary for the case of GitLab organizations, where the value of PROJECT_NAME can contain spaces.
-      #### Using the same approach for all VCS allows us to have unique 'search' scripts, rather than distinct VCS-specific ones.
-      PROJECT_FILENAME="$(echo $PROJECT_NAME | sed -r 's/ +/-spaces-/')"
-      ###########################################################################################################################
+    if [[ $(jq '.branches|length' project-settings-API-response.json) -gt 0 ]]; then
+      echo -e "\n'$REPO_NAME' is a current or past CircleCI project under the '$PARAM_ORG_NAME' organization. \n"  | tee -a fetch-projects.log
 
       #### These files will be used to search Additional SSH keys and integrations-related settings later in the script.
-      cat project-settings-API-response.json > project-settings-API-response-$PROJECT_NAME.json
+      cat project-settings-API-response.json > project-settings-API-response-"$PROJECT_NAME".json
       #### Keeping them so we don't make the same API call again for each project.
 
       #### This file will be used in all 'search' scripts.
       echo "$REPO_NAME;$ORG_SLUG/$REPO_NAME" >> projects-array-like-list.txt
       #### Keeping it for the entire duration of the job.
     else
-      echo -e "\'$REPO_NAME\' has never been a CircleCI project under the \'$PARAM_ORG_NAME\' organization. \n"  | tee -a fetch-projects.log
+      echo -e "'$REPO_NAME' has never been a CircleCI project under the '$PARAM_ORG_NAME' organization. \n"  | tee -a fetch-projects.log
     fi
 done < repos-list.txt
 

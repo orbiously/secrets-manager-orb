@@ -20,27 +20,25 @@ fi
 
 echo '{"contexts": []}' > all-contexts-report.json
 
-if [ -s contexts-array-like-list.txt ]; then
-  # jq -s '.' <<< $(cat contexts-items-all-objects.json) > contexts-items-all-array.json
-  # printf "Found $(jq '.|length' contexts-items-all-array.json) contexts \n\n"
-  echo -e "Found $(cat contexts-array-like-list.txt | wc -l) contexts in $ORG_NAME organization.\n\n" | tee -a contexts-env-vars.log
+if [[ -s contexts-array-like-list.txt ]]; then
+  echo -e "Found $( wc -l < contexts-array-like-list.txt | tr -d '[:blank:]') context(s) in the $ORG_NAME organization.\n\n" | tee -a contexts-env-vars.log
   
   #### Populating the report JSON file with names and ids of all identified contexts for the organization.
-  while read CONTEXT
+  while read -r CONTEXT
     do
-      CONTEXT_NAME="$(echo $PROJECT | cut -d ';' -f1)"
-      CONTEXT_ID="$(echo $PROJECT | cut -d ';' -f2)"
-
+      CONTEXT_NAME="$(echo "$CONTEXT" | cut -d ';' -f1)"
+      CONTEXT_ID="$(echo "$CONTEXT" | cut -d ';' -f2)"
+      #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
       echo "$(jq --arg PROJECT_NAME "$CONTEXT_NAME" --arg PROJECT_SLUG "$CONTEXT_ID" '.contexts += [{"'"name"'" : "'"$CONTEXT_NAME"'"}] | (.contexts[] | select(.name == "'"$CONTEXT_NAME"'")) += {"id" : "'"$CONTEXT_ID"'"}' all-contexts-report.json)" > all-contexts-report.json
   done < projects-array-like-list.txt
 
 
   #### For each of these contexts, determine if there are environment variables
   # for CONTEXT_ID in $(jq -r '.id' contexts-items-all-objects.json)
-  while read CONTEXT
+  while read -r CONTEXT
     do
-      CONTEXT_NAME="$(echo $PROJECT | cut -d ';' -f1)"
-      CONTEXT_ID="$(echo $PROJECT | cut -d ';' -f2)"
+      CONTEXT_NAME="$(echo "$CONTEXT" | cut -d ';' -f1)"
+      CONTEXT_ID="$(echo "$CONTEXT" | cut -d ';' -f2)"
 
       CONTEXT_ENV_VARS_PAGE=1
 
@@ -48,11 +46,12 @@ if [ -s contexts-array-like-list.txt ]; then
 
       PAGE_TOKEN=$(jq -r '.next_page_token' context-env-vars-API-response.json instead)
 
-      if [ $(jq '.items|length' context-env-vars-API-response.json instead) -gt 0 ]; then
-        jq '.items' context-env-vars-API-response.json  > context-$CONTEXT_ID-env-vars.json
+      if [[ $(jq '.items|length' context-env-vars-API-response.json instead) -gt 0 ]]; then
+        jq '.items' context-env-vars-API-response.json  > context-"$CONTEXT_ID"-env-vars.json
       else
-        echo "Context \'$CONTEXT_NAME\' doesn't have any stored environment variables." | tee -a projects-env-vars.log
+        echo "Context '""$CONTEXT_NAME""' doesn't have any stored environment variables." | tee -a projects-env-vars.log
         echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/organization/$ORG_SLUG/contexts/$CONTEXT_ID.\n\n" | tee -a projects-env-vars.log
+        #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
         echo "$(jq --arg CONTEXT_ID "$CONTEXT_ID" '(.contexts[] | select(.id == "'"$CONTEXT_ID"'")) .envvars |= .' all-contexts-report.json)" > all-contexts-report.json
         continue
       fi
@@ -62,18 +61,20 @@ if [ -s contexts-array-like-list.txt ]; then
           do
             ((CONTEXT_ENV_VARS_PAGE++))
             curl -s -G "https://circleci.com/api/v2/context/$CONTEXT_ID/environment-variable?page=$PAGE_TOKEN" -H "circle-token: $CIRCLE_TOKEN" > context-env-vars-API-response.json
-            echo "$(jq '. + input' context-$CONTEXT_ID-env-vars.json context-env-vars-API-response.json)" > context-$CONTEXT_ID-env-vars.json
+            echo "$(jq '. + input' context-"$CONTEXT_ID"-env-vars.json context-env-vars-API-response.json)" > context-"$CONTEXT_ID"-env-vars.json
         done
+      fi
 
-      echo "$(jq --arg CONTEXT_ID "$CONTEXT_ID" '(.contexts[] | select(.id == "'"$CONTEXT_ID"'") | .envvars) |= . + input' all-contexts-report.json context-$CONTEXT_ID-env-vars.json)" > all-contexts-report.json
+      #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
+      echo "$(jq --arg CONTEXT_ID "$CONTEXT_ID" '(.contexts[] | select(.id == "'"$CONTEXT_ID"'") | .envvars) |= . + input' all-contexts-report.json context-"$CONTEXT_ID"-env-vars.json)" > all-contexts-report.json
 
-      echo "Context \'$CONTEXT_NAME\' has $(jq 'length' context-$CONTEXT_ID-env-vars.json) environment variable(s)"
+      echo -e "Context '$CONTEXT_NAME' has $(jq 'length' context-"$CONTEXT_ID"-env-vars.json) environment variable(s)"
       echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/organization/$ORG_SLUG/contexts/$CONTEXT_ID.\n\n" | tee -a contexts-env-vars.log 
 
   done < contexts-array-like-list.txt
 else
-  echo "No contexts found for organization \'$ORG_NAME\'\n" | tee -a contexts-env-vars.log
-  echo $(jq '. .contexts = null' all-contexts-report.json) > all-contexts-report.json
+  echo -e "No contexts found for organization '$ORG_NAME'." | tee -a contexts-env-vars.log
+  echo "$(jq '. .contexts = null' all-contexts-report.json)" > all-contexts-report.json
 fi
 
 #### Clean-up
