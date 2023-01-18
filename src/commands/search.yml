@@ -76,7 +76,7 @@ steps:
               PARAM_VCS: << parameters.vcs >>
               PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for environment variables in projects
-            command: <<include(scripts/projects/env-vars.sh)>>
+            command: <<include(scripts/projects/search-env-vars.sh)>>
 
   - when:
       condition: << parameters.search-projects-api-tokens >>
@@ -87,7 +87,7 @@ steps:
               PARAM_VCS: << parameters.vcs >>
               PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for project-level API tokens
-            command: <<include(scripts/projects/api-tokens.sh)>>
+            command: <<include(scripts/projects/search-api-tokens.sh)>>
 
   - when:
       condition: << parameters.search-projects-ssh-keys >>
@@ -98,7 +98,7 @@ steps:
               PARAM_VCS: << parameters.vcs >>
               PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for SSH keys in projects
-            command: <<include(scripts/projects/ssh-keys.sh)>>
+            command: <<include(scripts/projects/search-ssh-keys.sh)>>
 
   - when:
       condition: << parameters.search-contexts-env-vars >>
@@ -109,4 +109,4 @@ steps:
               PARAM_VCS: << parameters.vcs >>
               PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for environment variables in organization contexts
-            command: <<include(scripts/contexts/env-vars.sh)>>
+            command: <<include(scripts/contexts/search-env-vars.sh)>>

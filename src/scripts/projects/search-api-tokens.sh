@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -e "\n\n######################## SEARCHING FOR PROJECTS API TOKENS ######################## \n" | tee -a projects-api-tokenss.log
+echo -e "\n\n######################## SEARCHING FOR PROJECTS API TOKENS ######################## \n" | tee -a projects-api-tokens.log
 
 while read PROJECT
   do 

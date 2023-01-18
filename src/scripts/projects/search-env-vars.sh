@@ -22,7 +22,7 @@ while read PROJECT
       jq '.items' project-env-vars-API-response.json  >> project-env-vars-$PROJECT_FILENAME.json
     else
       printf "Project \'%s\' doesn't have any stored environment variables \n\n" "$PROJECT_NAME" | tee -a projects-env-vars.log
-      echo "$(jq --arg PROJECT "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .envvars |= .' all-projects-report.json)" > all-projects-report.json
+      echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .envvars |= .' all-projects-report.json)" > all-projects-report.json
       continue
     fi
 
