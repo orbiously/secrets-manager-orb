@@ -36,7 +36,7 @@ while read PROJECT
       done
     fi
 
-    echo "$(jq --arg PROJECT "$PROJECT_NAME" --arg PROJECT_SLUG "$PROJECT_SLUG" '(.projects[] | select(.name == "'"$PROJECT_NAME"'") | .envvars) |= . + input' all-projects-report.json project-env-vars-$PROJECT_FILENAME.json)" > all-projects-report.json
+    echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" --arg PROJECT_SLUG "$PROJECT_SLUG" '(.projects[] | select(.name == "'"$PROJECT_NAME"'") | .envvars) |= . + input' all-projects-report.json project-env-vars-$PROJECT_FILENAME.json)" > all-projects-report.json
 
     echo -e "Project \'$PROJECT_NAME\' has $(jq -s length project-env-vars-$PROJECT_FILENAME.json) environment variables --> https://app.circleci.com/settings/project/$PROJECT_SLUG/environment-variables \n" | tee -a projects-env-vars.log
 done < projects-array-like-list.txt
