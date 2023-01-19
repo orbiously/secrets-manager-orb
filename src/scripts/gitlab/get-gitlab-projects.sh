@@ -43,9 +43,9 @@ if [[ "$PAGE_TOKEN" != "null" ]]; then
       do
         ((PROJECTS_PAGE++))
         echo "Fetching organization projects - Page #$PROJECTS_PAGE" | tee -a fetch-projects.log
-        curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID&page-token=$PAGE_TOKEN" -H "circle-token: $CIRCLECI_API_TOKEN" > projects-list-page-$PROJECTS_PAGE.json
+        curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID&page-token=$PAGE_TOKEN" -H "circle-token: $CIRCLECI_API_TOKEN" > projects-list-page-"$PROJECTS_PAGE".json
         echo -e "Found $(jq '.items|length' projects-page-$PROJECTS_PAGE.json) project(s)\n\n" | tee -a fetch-projects.log
-        jq -r '.items[]|.name +";" +.slug' projects-page-$PROJECTS_PAGE.json >> projects-array-like-list.txt
+        jq -r '.items[]|.name +";" +.slug' projects-page-"$PROJECTS_PAGE".json >> projects-array-like-list.txt
         PAGE_TOKEN=$(jq -r '.next_page_token' project-env-vars-API-response.json)
     done
 fi
