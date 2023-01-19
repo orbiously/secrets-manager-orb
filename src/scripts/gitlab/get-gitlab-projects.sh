@@ -22,12 +22,12 @@
 
 ########## Using the '/private' endpoint instead ##########
 
-ORG_ID=$(curl -s -G "https://circleci.com/api/v2/me/collaborations" -H "Circle-Token: $CCI_API_T5" | jq -r --arg ORG_NAME "$ORG_NAME" '.[] | select(.name == "'"$ORG_NAME"'") | .id')
+ORG_ID=$(curl -s -G "https://circleci.com/api/v2/me/collaborations" -H "Circle-Token: ${!PARAM_CIRCLE_TOKEN}" | jq -r --arg ORG_NAME "$ORG_NAME" '.[] | select(.name == "'"$ORG_NAME"'") | .id')
 
 PROJECTS_PAGE=1
 echo "Fetching organization projects - Page #$PROJECTS_PAGE" | tee -a fetch-projects.log
 
-curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID" -H "Circle-Token: $CCI_API_T5" > projects-list-page-"$PROJECTS_PAGE".json
+curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID" -H "Circle-Token: ${!PARAM_CIRCLE_TOKEN}" > projects-list-page-"$PROJECTS_PAGE".json
 
 PAGE_TOKEN=$(jq -r '.next_page_token' projects-page-$PROJECTS_PAGE.json)
 
@@ -43,7 +43,7 @@ if [[ "$PAGE_TOKEN" != "null" ]]; then
       do
         ((PROJECTS_PAGE++))
         echo "Fetching organization projects - Page #$PROJECTS_PAGE" | tee -a fetch-projects.log
-        curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID&page-token=$PAGE_TOKEN" -H "circle-token: $CIRCLECI_API_TOKEN" > projects-list-page-"$PROJECTS_PAGE".json
+        curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID&page-token=$PAGE_TOKEN" -H "circle-token: ${!PARAM_CIRCLE_TOKEN}" > projects-list-page-"$PROJECTS_PAGE".json
         echo -e "Found $(jq '.items|length' projects-page-"$PROJECTS_PAGE".json) project(s)\n\n" | tee -a fetch-projects.log
         jq -r '.items[]|.name +";" +.slug' projects-page-"$PROJECTS_PAGE".json >> projects-array-like-list.txt
         PAGE_TOKEN=$(jq -r '.next_page_token' project-env-vars-API-response.json)
