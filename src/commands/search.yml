@@ -13,7 +13,7 @@ parameters:
     description: |
        The name of the organization you want to search secrests in.
     type: string
-  
+
   circle-token:
     description: |
         Name of the environment variable containing the CircleCI personal API token.
@@ -32,7 +32,7 @@ parameters:
         Whether or not to search for API tokens in projects.
     type: boolean
     default: true
-  
+
   search-projects-ssh-keys:
     description: |
         Whether or not to search for SSH keys in projects.
