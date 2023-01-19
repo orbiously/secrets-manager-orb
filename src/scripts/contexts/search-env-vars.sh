@@ -66,7 +66,7 @@ if [[ -s contexts-array-like-list.txt ]]; then
       fi
 
       #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
-      echo "$(jq --arg CONTEXT_ID "$CONTEXT_ID" '(.contexts[] | select(.id == "'"$CONTEXT_ID"'") | .envvars) |= . + input' all-contexts-report.json context-"$CONTEXT_ID"-env-vars.json)" > all-contexts-report.json
+      echo "$(jq --arg CONTEXT_ID "$CONTEXT_ID" '(.contexts[] | select(.id == "'"$CONTEXT_ID"'")) .envvars |= . + input' all-contexts-report.json context-"$CONTEXT_ID"-env-vars.json)" > all-contexts-report.json
 
       echo -e "Context '$CONTEXT_NAME' has $(jq 'length' context-"$CONTEXT_ID"-env-vars.json) environment variable(s)"
       echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/organization/$ORG_SLUG/contexts/$CONTEXT_ID.\n\n" | tee -a contexts-env-vars.log 

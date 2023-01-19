@@ -19,7 +19,7 @@ if [[ -s projects-array-like-list.txt ]]; then
         if [[ $(jq '.items|length' project-checkout-keys-API-response.json) -gt 0 ]]; then
           jq '.items' project-checkout-keys-API-response.json > checkout-keys-"$PROJECT_FILENAME".json
           #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
-          echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'") | .checkout_keys) |= . + input' all-projects-report.json checkout-keys-"$PROJECT_FILENAME".json)" > all-projects-report.json
+          echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .checkout_keys |= . + input' all-projects-report.json checkout-keys-"$PROJECT_FILENAME".json)" > all-projects-report.json
           echo -e "Project '$PROJECT_NAME' has $(jq '.|length' checkout-keys-"$PROJECT_FILENAME".json) Checkout SSH keys --> https://app.circleci.com/settings/project/$PROJECT_SLUG/ssh \n" | tee -a projects-ssh-keys.log
         else
           echo -e "There are no Checkout SSH keys in project '$PROJECT_NAME'.\n\n"
@@ -31,7 +31,7 @@ if [[ -s projects-array-like-list.txt ]]; then
         if [[ $(jq '.ssh_keys | length' project-settings-API-response-"$PROJECT_FILENAME".json) -gt 0 ]]; then
           jq '.ssh_keys' project-settings-API-response-"$PROJECT_FILENAME".json > extra-ssh-and-integrations-"$PROJECT_FILENAME".json
           #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
-          echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'") | .additional_ssh) |= . + input' all-projects-report.json extra-ssh-and-integrations-"$PROJECT_FILENAME".json)" > all-projects-report.json
+          echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .additional_ssh |= . + input' all-projects-report.json extra-ssh-and-integrations-"$PROJECT_FILENAME".json)" > all-projects-report.json
           echo -e "Project '$PROJECT_NAME' has $(jq '. | length' extra-ssh-and-integrations-"$PROJECT_FILENAME".json) Additional SSH key(s)."
           echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/project/$PROJECT_SLUG/ssh \n\n" | tee -a projects-ssh-keys.log
         else
