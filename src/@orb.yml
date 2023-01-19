@@ -1,13 +1,12 @@
 version: 2.1
 
 description: >
-  Sample orb description
-# What will your orb allow users to accomplish?
-# Descriptions should be short, simple, and informative.
+  The 'secrets-manager' orb allows users to search for secrets stored
+  in the organization projects (environment variables, project-level API tokens, SSH keys),
+  as well as, in their organization contexts (environment variables).
 
-# This information will be displayed in the orb registry and is not mandatory.
 display:
-  home_url: "https://www.example.com/docs"
+#  home_url: "https://github.com/orbiously/secrets-manager-orb"
   source_url: "https://github.com/orbiously/secrets-manager-orb"
 
 # If your orb requires other orbs, you can import them like this. Otherwise remove the "orbs" stanza.
