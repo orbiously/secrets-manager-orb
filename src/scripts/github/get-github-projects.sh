@@ -36,7 +36,7 @@ while read -r REPO_NAME
       #### Keeping them so we don't make the same API call again for each project.
 
       #### This file will be used in all 'search' scripts.
-      echo "$REPO_NAME;$ORG_SLUG/$REPO_NAME" >> projects-array-like-list.txt
+      echo "$REPO_NAME;$ORG_SLUG/$REPO_NAME" > projects-array-like-list.txt
       #### Keeping it for the entire duration of the job.
     else
       echo -e "'$REPO_NAME' has never been a CircleCI project under the '$PARAM_ORG_NAME' organization. \n"  | tee -a fetch-projects.log
