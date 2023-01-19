@@ -9,7 +9,7 @@ elif [[ "$PARAM_VCS" = "github" ]]; then eval "$SCRIPT_GET_PROJECTS_GITHUB";
 elif [[ "$PARAM_VCS" = "gitlab" ]]; then eval "$SCRIPT_GET_PROJECTS_GITLAB";
 fi
 
-if [[ -s contexts-array-like-list.txt ]]; then
+if [[ -s projects-array-like-list.txt ]]; then
   #### Populating the report JSON file with names and slugs of all identified projects for the organization.
   while read -r PROJECT
     do
