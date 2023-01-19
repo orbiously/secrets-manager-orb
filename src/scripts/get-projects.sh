@@ -2,6 +2,25 @@
 
 echo '{"projects": []}' > all-projects-report.json
 
+
+case "$PARAM_VCS" in
+  "bitbucket")
+    VCS_SLUG="bb"
+    ORG_SLUG="$VCS_SLUG/$PARAM_ORG_NAME"
+    ;;
+  "github")
+    VCS_SLUG="bb"
+    ORG_SLUG="$VCS_SLUG/$PARAM_ORG_NAME"
+    ;;
+  "gitlab")
+    VCS_SLUG="circleci"
+    ORG_SLUG=$(curl -s -G "https://circleci.com/api/v2/me/collaborations" -H "Circle-Token: ${!PARAM_CIRCLE_TOKEN}" | jq -r --arg ORG_NAME "$PARAM_ORG_NAME" '.[] | select(.name == "'"$PARAM_ORG_NAME"'") | .slug')
+    ;;
+esac
+
+export VCS_SLUG
+export ORG_SLUG
+
 #### These scripts will produce a 'projects-array-like-list.txt' file.
 #### Each line of the file is a project's name and its slug, separated by a ';' (semi-colon).
 if [[ "$PARAM_VCS" = "bitbucket" ]]; then eval "$SCRIPT_GET_PROJECTS_BITBUCKET";
@@ -18,3 +37,6 @@ while read -r PROJECT
     #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
     echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" --arg PROJECT_SLUG "$PROJECT_SLUG" '.projects += [{"'"name"'" : "'"$PROJECT_NAME"'"}] | (.projects[] | select(.name == "'"$PROJECT_NAME"'")) += {"slug" : "'"$PROJECT_SLUG"'"}' all-projects-report.json)" > all-projects-report.json
 done < projects-array-like-list.txt
+
+echo "export VCS_SLUG=$VCS_SLUG" >> "$BASH_ENV"
+echo "export ORG_SLUG=$ORG_SLUG" >> "$BASH_ENV"

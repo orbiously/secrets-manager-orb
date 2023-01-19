@@ -8,7 +8,7 @@ REPOS_PAGE=1
 echo -e "Fetching repositories - Page #$REPOS_PAGE\n" | tee -a fetch-projects.log
 
 #### The response from the below endpoint will also include 'archived' repos.
-curl -s -G "https://circleci.com/api/v1.1/user/repos/$VCS_SLUG?page=$REPOS_PAGE&per-page=100" -H "Circle-Token: $CIRCLE_TOKEN" > repos-list-page-"$REPOS_PAGE".json
+curl -s -G "https://circleci.com/api/v1.1/user/repos/$PARAM_VCS?page=$REPOS_PAGE&per-page=100" -H "Circle-Token: $CIRCLE_TOKEN" > repos-list-page-"$REPOS_PAGE".json
 jq -r --arg PARAM_ORG_NAME "$PARAM_ORG_NAME" '.[]|select(.owner.login == $PARAM_ORG_NAME)|.name' repos-list-page-"$REPOS_PAGE".json > repos-list.txt
 
 
@@ -17,7 +17,7 @@ if [[ $(jq 'length' repos-list-page-$REPOS_PAGE.json) -eq 100 ]]; then
     do
     ((REPOS_PAGE++))
     echo -e "Fetching repositories - Page #$REPOS_PAGE\n" | tee -a fetch-projects.log
-    curl -s -G "https://circleci.com/api/v1.1/user/repos/$VCS_SLUG?page=$REPOS_PAGE&per-page=100" -H "Circle-Token: $CIRCLE_TOKEN" > repos-list-page-"$REPOS_PAGE".json
+    curl -s -G "https://circleci.com/api/v1.1/user/repos/$PARAM_VCS?page=$REPOS_PAGE&per-page=100" -H "Circle-Token: $CIRCLE_TOKEN" > repos-list-page-"$REPOS_PAGE".json
     jq -r --arg PARAM_ORG_NAME "$PARAM_ORG_NAME" '.[]|select(.owner.login == $PARAM_ORG_NAME)|.name' repos-list-page-"$REPOS_PAGE".json >> repos-list.txt
   done
 fi
@@ -36,7 +36,7 @@ while read -r REPO_NAME
       #### Keeping them so we don't make the same API call again for each project.
 
       #### This file will be used in all 'search' scripts.
-      echo "$REPO_NAME;$ORG_SLUG/$REPO_NAME" > projects-array-like-list.txt
+      echo "$REPO_NAME;$ORG_SLUG/$REPO_NAME" >> projects-array-like-list.txt
       #### Keeping it for the entire duration of the job.
     else
       echo -e "'$REPO_NAME' has never been a CircleCI project under the '$PARAM_ORG_NAME' organization. \n"  | tee -a fetch-projects.log
