@@ -20,7 +20,7 @@ fi
 
 echo '{"contexts": []}' > all-contexts-report.json
 
-if [[ -s contexts-array-like-list.txt ]]; then
+if [ -s contexts-array-like-list.txt ]; then
   echo -e "Found $( wc -l < contexts-array-like-list.txt | tr -d '[:blank:]') context(s) in the $ORG_NAME organization.\n\n" | tee -a contexts-env-vars.log
   
   #### Populating the report JSON file with names and ids of all identified contexts for the organization.

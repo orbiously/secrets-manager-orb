@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ -s projects-array-like-list.txt ]]; then
+if [ -s projects-array-like-list.txt ]; then
 
   echo -e "\n\n######################## SEARCHING FOR SSH KEYS ########################\n" | tee -a projects-ssh-keys.log
 
