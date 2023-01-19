@@ -13,7 +13,7 @@ case "$PARAM_VCS" in
     ;;
   "github")
     DISPLAY_VCS="GitHub"
-    VCS_SLUG="bb"
+    VCS_SLUG="gh"
     ORG_SLUG="$VCS_SLUG/$PARAM_ORG_NAME"
     ;;
   "gitlab")
