@@ -29,8 +29,8 @@ if [[ -s contexts-array-like-list.txt ]]; then
       CONTEXT_NAME="$(echo "$CONTEXT" | cut -d ';' -f1)"
       CONTEXT_ID="$(echo "$CONTEXT" | cut -d ';' -f2)"
       #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
-      echo "$(jq --arg PROJECT_NAME "$CONTEXT_NAME" --arg PROJECT_SLUG "$CONTEXT_ID" '.contexts += [{"'"name"'" : "'"$CONTEXT_NAME"'"}] | (.contexts[] | select(.name == "'"$CONTEXT_NAME"'")) += {"id" : "'"$CONTEXT_ID"'"}' all-contexts-report.json)" > all-contexts-report.json
-  done < projects-array-like-list.txt
+      echo "$(jq --arg CONTEXT_NAME "$CONTEXT_NAME" --arg PROJECT_SLUG "$CONTEXT_ID" '.contexts += [{"'"name"'" : "'"$CONTEXT_NAME"'"}] | (.contexts[] | select(.name == "'"$CONTEXT_NAME"'")) += {"id" : "'"$CONTEXT_ID"'"}' all-contexts-report.json)" > all-contexts-report.json
+  done < contexts-array-like-list.txt
 
 
   #### For each of these contexts, determine if there are environment variables
