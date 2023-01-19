@@ -10,22 +10,22 @@ case "$PARAM_VCS" in
     DISPLAY_VCS="Bitbucket"
     VCS_SLUG="bb"
     ORG_SLUG="$VCS_SLUG/$PARAM_ORG_NAME"
-    export ORG_SLUG
     ;;
   "github")
     DISPLAY_VCS="GitHub"
     VCS_SLUG="bb"
     ORG_SLUG="$VCS_SLUG/$PARAM_ORG_NAME"
-    export ORG_SLUG
+    
     ;;
   "gitlab")
     DISPLAY_VCS="GitLab"
     VCS_SLUG="circleci"
     ORG_SLUG=$(curl -s -G "https://circleci.com/api/v2/me/collaborations" -H "Circle-Token: ${!PARAM_CIRCLE_TOKEN}" | jq -r --arg ORG_NAME "$PARAM_ORG_NAME" '.[] | select(.name == "'"$PARAM_ORG_NAME"'") | .slug')
-    export ORG_SLUG
     ;;
 esac
 
+export VCS_SLUG
+export ORG_SLUG
 
 if  ! curl -s "https://circleci.com/api/v2/me/collaborations" -H "Circle-Token: ${!PARAM_CIRCLE_TOKEN}" | jq -r '.[].name' | grep -q "${PARAM_ORG_NAME}"; then
   echo "Unable to confirm access to the organization."
