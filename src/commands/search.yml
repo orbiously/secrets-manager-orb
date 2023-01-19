@@ -48,7 +48,7 @@ parameters:
 steps:
 
   - jq/install
-  
+
   - run:
       environment:
         PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
