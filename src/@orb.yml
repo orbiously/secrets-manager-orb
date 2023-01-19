@@ -11,4 +11,4 @@ display:
 
 # If your orb requires other orbs, you can import them like this. Otherwise remove the "orbs" stanza.
 orbs:
-jq: circleci/jq@2.2.0
+  jq: circleci/jq@2.2.0
