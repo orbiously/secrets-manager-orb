@@ -45,9 +45,9 @@ if [ -s contexts-array-like-list.txt ]; then
 
       curl -s -G "https://circleci.com/api/v2/context/$CONTEXT_ID/environment-variable" -H "circle-token: $CIRCLE_TOKEN" > context-env-vars-API-response.json
 
-      PAGE_TOKEN=$(jq -r '.next_page_token' context-env-vars-API-response.json instead)
+      PAGE_TOKEN=$(jq -r '.next_page_token' context-env-vars-API-response.json)
 
-      if [[ $(jq '.items|length' context-env-vars-API-response.json instead) -gt 0 ]]; then
+      if [[ $(jq '.items|length' context-env-vars-API-response.json) -gt 0 ]]; then
         jq '.items' context-env-vars-API-response.json  > context-"$CONTEXT_ID"-env-vars.json
       else
         echo "Context '""$CONTEXT_NAME""' doesn't have any stored environment variables." | tee -a contexts-env-vars.log
