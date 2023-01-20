@@ -42,7 +42,7 @@ if [ -s contexts-array-like-list.txt ]; then
 
       CONTEXT_ENV_VARS_PAGE=1
 
-      curl -s -G "https://circleci.com/api/v2/context/$CONTEXT_ID/environment-variable" -H "circle-token: $CIRCLE_TOKEN" > context-env-vars-API-response.json instead
+      curl -s -G "https://circleci.com/api/v2/context/$CONTEXT_ID/environment-variable" -H "circle-token: $CIRCLE_TOKEN" > context-env-vars-API-response.json
 
       PAGE_TOKEN=$(jq -r '.next_page_token' context-env-vars-API-response.json instead)
 
