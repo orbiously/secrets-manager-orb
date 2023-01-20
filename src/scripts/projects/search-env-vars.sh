@@ -23,7 +23,8 @@ if [ -s projects-array-like-list.txt ]; then
       if [[ $(jq '.items|length' project-env-vars-API-response.json) -gt 0 ]]; then
         jq '.items' project-env-vars-API-response.json  > project-env-vars-"$PROJECT_FILENAME".json
       else
-        echo -e "Project '$PROJECT_NAME' doesn't have any stored environment variables \n\n" | tee -a projects-env-vars.log
+        echo -e "Project '$PROJECT_NAME' doesn't have any stored environment variables." | tee -a projects-env-vars.log
+        echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/project/$PROJECT_SLUG/environment-variables \n\n" | tee -a projects-env-vars.log
         #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
         echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .envvars |= .' all-projects-report.json)" > all-projects-report.json
         continue
@@ -43,7 +44,7 @@ if [ -s projects-array-like-list.txt ]; then
       #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
       echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .envvars |= . + input' all-projects-report.json project-env-vars-"$PROJECT_FILENAME".json)" > all-projects-report.json
 
-      echo -e "Project '$PROJECT_NAME' has $(jq 'length' project-env-vars-"$PROJECT_FILENAME".json) environment variable(s)"
+      echo -e "Project '$PROJECT_NAME' has $(jq 'length' project-env-vars-"$PROJECT_FILENAME".json) environment variable(s)." | tee -a projects-env-vars.log
       echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/project/$PROJECT_SLUG/environment-variables \n\n" | tee -a projects-env-vars.log
   done < projects-array-like-list.txt
 
