@@ -111,3 +111,12 @@ steps:
               PARAM_ORG_NAME: << parameters.org-name >>
             name: Searching for environment variables in organization contexts
             command: <<include(scripts/contexts/search-env-vars.sh)>>
+
+  - store_artifacts:
+      path: all-projects-report.json
+      destination: projects-secrets-report.json
+
+  - store_artifacts:
+      path: all-contexts-report.json
+      destination: contexts-secrets-report.json
+
