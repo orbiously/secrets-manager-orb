@@ -29,7 +29,7 @@ while read -r REPO_NAME
     echo -e "Checking if '$REPO_NAME' is or ever was a CircleCI project..." | tee -a fetch-projects.log
     curl -s -G "https://circleci.com/api/v1.1/project/$ORG_SLUG/$REPO_NAME/settings" -H "circle-token: ${!PARAM_CIRCLE_TOKEN}" > project-settings-API-response.json
     if [[ $(jq '.branches|length' project-settings-API-response.json) -gt 0 ]]; then
-      echo -e "\n'$REPO_NAME' is a current or past CircleCI project under the '$PARAM_ORG_NAME' organization. \n"  | tee -a fetch-projects.log
+      echo -e "\n'$REPO_NAME' is a current or past CircleCI project under the '$PARAM_ORG_NAME' organization.\n"  | tee -a fetch-projects.log
 
       #### These files will be used to search Additional SSH keys and integrations-related settings later in the script.
       cat project-settings-API-response.json > project-settings-API-response-"$PROJECT_NAME".json
@@ -39,7 +39,7 @@ while read -r REPO_NAME
       echo "$REPO_NAME;$ORG_SLUG/$REPO_NAME" >> projects-array-like-list.txt
       #### Keeping it for the entire duration of the job.
     else
-      echo -e "'$REPO_NAME' has never been a CircleCI project under the '$PARAM_ORG_NAME' organization. \n"  | tee -a fetch-projects.log
+      echo -e "'$REPO_NAME' has never been a CircleCI project under the '$PARAM_ORG_NAME' organization.\n"  | tee -a fetch-projects.log
     fi
 done < repos-list.txt
 

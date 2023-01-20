@@ -32,7 +32,7 @@ curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID" -H
 PAGE_TOKEN=$(jq -r '.next_page_token' projects-page-$PROJECTS_PAGE.json)
 
 if [[ $(jq '.items|length' projects-page-$PROJECTS_PAGE.json) -gt 0 ]]; then
-    echo -e "Found $(jq '.items|length' projects-page-$PROJECTS_PAGE.json) project(s)\n\n" | tee -a fetch-projects.log
+    echo -e "Found $(jq '.items|length' projects-page-$PROJECTS_PAGE.json) project(s)\n" | tee -a fetch-projects.log
     jq -r '.items[]|.name +";" +.slug' projects-page-$PROJECTS_PAGE.json >> projects-array-like-list.txt
 else
     printf "Organization '%s' doesn't have any projects in CircleCI \n\n" "$ORG_NAME" | tee -a fetch-projects.log
@@ -44,7 +44,7 @@ if [[ "$PAGE_TOKEN" != "null" ]]; then
         ((PROJECTS_PAGE++))
         echo "Fetching organization projects - Page #$PROJECTS_PAGE" | tee -a fetch-projects.log
         curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID&page-token=$PAGE_TOKEN" -H "circle-token: ${!PARAM_CIRCLE_TOKEN}" > projects-list-page-"$PROJECTS_PAGE".json
-        echo -e "Found $(jq '.items|length' projects-page-"$PROJECTS_PAGE".json) project(s)\n\n" | tee -a fetch-projects.log
+        echo -e "Found $(jq '.items|length' projects-page-"$PROJECTS_PAGE".json) project(s)\n" | tee -a fetch-projects.log
         jq -r '.items[]|.name +";" +.slug' projects-page-"$PROJECTS_PAGE".json >> projects-array-like-list.txt
         PAGE_TOKEN=$(jq -r '.next_page_token' project-env-vars-API-response.json)
     done

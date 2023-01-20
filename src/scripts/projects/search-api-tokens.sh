@@ -18,9 +18,11 @@ if [ -s projects-array-like-list.txt ]; then
         if [[ $(jq '.|length' project-tokens-"$PROJECT_FILENAME".json) -gt 0 ]]; then
           #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
           echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .project_api_tokens |= . + input' all-projects-report.json project-tokens-"$PROJECT_FILENAME".json)" > all-projects-report.json
-          echo -e "Project $PROJECT_NAME has $(jq '.|length' project-tokens-"$PROJECT_FILENAME".json) project tokens --> https://app.circleci.com/settings/project/$PROJECT_SLUG/api \n" | tee -a projects-api-tokens.log
+          echo -e "Project $PROJECT_NAME has $(jq '.|length' project-tokens-"$PROJECT_FILENAME".json) project tokens." | tee -a projects-api-tokens.log
+          echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/project/$PROJECT_SLUG/api \n\n" | tee -a projects-api-tokens.log
         else
-          echo -e "There are no Project API tokens in project '$PROJECT_NAME' \n\n" | tee -a projects-api-tokens.log
+          echo -e "There are no Project API tokens in project '$PROJECT_NAME'." | tee -a projects-api-tokens.log
+          echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/project/$PROJECT_SLUG/api \n\n" | tee -a projects-api-tokens.log
           #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
           echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .project_api_tokens |= .' all-projects-report.json)" > all-projects-report.json
         fi

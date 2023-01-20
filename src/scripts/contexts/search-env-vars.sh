@@ -21,7 +21,8 @@ fi
 echo '{"contexts": []}' > all-contexts-report.json
 
 if [ -s contexts-array-like-list.txt ]; then
-  echo -e "Found $( wc -l < contexts-array-like-list.txt | tr -d '[:blank:]') context(s) in the $ORG_NAME organization.\n\n" | tee -a contexts-env-vars.log
+  echo -e "Found $( wc -l < contexts-array-like-list.txt | tr -d '[:blank:]') context(s) in the $ORG_NAME organization." | tee -a contexts-env-vars.log
+  echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/organization/$ORG_SLUG/contexts.\n\n" | tee -a contexts-env-vars.log
   
   #### Populating the report JSON file with names and ids of all identified contexts for the organization.
   while read -r CONTEXT
@@ -49,8 +50,8 @@ if [ -s contexts-array-like-list.txt ]; then
       if [[ $(jq '.items|length' context-env-vars-API-response.json instead) -gt 0 ]]; then
         jq '.items' context-env-vars-API-response.json  > context-"$CONTEXT_ID"-env-vars.json
       else
-        echo "Context '""$CONTEXT_NAME""' doesn't have any stored environment variables." | tee -a projects-env-vars.log
-        echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/organization/$ORG_SLUG/contexts/$CONTEXT_ID.\n\n" | tee -a projects-env-vars.log
+        echo "Context '""$CONTEXT_NAME""' doesn't have any stored environment variables." | tee -a contexts-env-vars.log
+        echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/organization/$ORG_SLUG/contexts/$CONTEXT_ID.\n\n" | tee -a contexts-env-vars.log
         #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
         echo "$(jq --arg CONTEXT_ID "$CONTEXT_ID" '(.contexts[] | select(.id == "'"$CONTEXT_ID"'")) .envvars |= .' all-contexts-report.json)" > all-contexts-report.json
         continue
@@ -68,7 +69,7 @@ if [ -s contexts-array-like-list.txt ]; then
       #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
       echo "$(jq --arg CONTEXT_ID "$CONTEXT_ID" '(.contexts[] | select(.id == "'"$CONTEXT_ID"'")) .envvars |= . + input' all-contexts-report.json context-"$CONTEXT_ID"-env-vars.json)" > all-contexts-report.json
 
-      echo -e "Context '$CONTEXT_NAME' has $(jq 'length' context-"$CONTEXT_ID"-env-vars.json) environment variable(s)"
+      echo -e "Context '$CONTEXT_NAME' has $(jq 'length' context-"$CONTEXT_ID"-env-vars.json) environment variable(s)"| tee -a contexts-env-vars.log
       echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/organization/$ORG_SLUG/contexts/$CONTEXT_ID.\n\n" | tee -a contexts-env-vars.log 
 
   done < contexts-array-like-list.txt
