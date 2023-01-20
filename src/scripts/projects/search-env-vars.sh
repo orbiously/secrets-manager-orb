@@ -41,7 +41,7 @@ if [ -s projects-array-like-list.txt ]; then
       fi
 
       #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
-      echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" --arg PROJECT_SLUG "$PROJECT_SLUG" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .envvars |= . + input' all-projects-report.json project-env-vars-"$PROJECT_FILENAME".json)" > all-projects-report.json
+      echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .envvars |= . + input' all-projects-report.json project-env-vars-"$PROJECT_FILENAME".json)" > all-projects-report.json
 
       echo -e "Project '$PROJECT_NAME' has $(jq 'length' project-env-vars-"$PROJECT_FILENAME".json) environment variable(s)"
       echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/project/$PROJECT_SLUG/environment-variables \n\n" | tee -a projects-env-vars.log
