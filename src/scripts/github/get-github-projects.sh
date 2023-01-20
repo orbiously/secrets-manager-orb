@@ -33,7 +33,7 @@ while read -r REPO_NAME
       echo -e "'$REPO_NAME' is a current or past CircleCI project under the '$PARAM_ORG_NAME' organization. \n"  | tee -a fetch-projects.log
 
       #### These files will be used to search Additional SSH keys and integrations-related settings later in the script.
-      cat project-settings-API-response.json > project-settings-API-response-"$PROJECT_NAME".json
+      cat project-settings-API-response.json > project-settings-API-response-"$REPO_NAME".json
       #### Keeping them so we don't make the same API call again for each project.
 
       #### This file will be used in all 'search' scripts.
