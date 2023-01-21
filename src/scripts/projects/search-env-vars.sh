@@ -51,3 +51,7 @@ if [ -s projects-array-like-list.txt ]; then
 else
   echo "No projects to search in." | tee -a projects-env-vars.log
 fi
+
+#Clean-up
+rm -f project-env-vars-API-response.json
+rm -f project-env-vars-*.json
