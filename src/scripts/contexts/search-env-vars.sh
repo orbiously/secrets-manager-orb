@@ -21,7 +21,7 @@ fi
 echo '{"contexts": []}' > all-contexts-report.json
 
 if [ -s contexts-array-like-list.txt ]; then
-  echo -e "Found $( wc -l < contexts-array-like-list.txt | tr -d '[:blank:]') context(s) in the $ORG_NAME organization." | tee -a contexts-env-vars.log
+  echo -e "Found $( wc -l < contexts-array-like-list.txt | tr -d '[:blank:]') context(s) in the '$PARAM_ORG_NAME' organization." | tee -a contexts-env-vars.log
   echo -e "View in the CircleCI UI --> https://app.circleci.com/settings/organization/$ORG_SLUG/contexts.\n\n" | tee -a contexts-env-vars.log
   
   #### Populating the report JSON file with names and ids of all identified contexts for the organization.
