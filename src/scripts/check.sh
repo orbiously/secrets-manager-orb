@@ -25,7 +25,9 @@ if  ! jq -r '.[].name' collab-API-response.json | grep -q "${PARAM_ORG_NAME}"; t
   echo "Make sure you specified the correct name (with the exact capitulization)."
   exit 1
 else
-  ORG_SLUG=$(jq -r --arg ORG_NAME "$PARAM_ORG_NAME" '.[] | select(.name == "'"$PARAM_ORG_NAME"'") | .slug' collab-API-response.json)
+  ORG_SLUG=$(jq -r --arg PARAM_ORG_NAME "$PARAM_ORG_NAME" '.[] | select(.name == "'"$PARAM_ORG_NAME"'") | .slug' collab-API-response.json)
+  ORG_ID=$(jq -r --arg PARAM_ORG_NAME "$PARAM_ORG_NAME" '.[] | select(.name == "'"$PARAM_ORG_NAME"'") | .id' collab-API-response.json)
 fi
 
 echo "export ORG_SLUG=$ORG_SLUG" >> "$BASH_ENV"
+echo "export ORG_ID=$ORG_ID" >> "$BASH_ENV"

@@ -1,13 +1,41 @@
 #!/bin/bash
 
+# #### These scripts will produce a 'projects-array-like-list.txt' file.
+# #### Each line of the file is a project's name and its slug, separated by a ';' (semi-colon).
+# if [[ "$PARAM_VCS" = "bitbucket" ]]; then eval "$SCRIPT_GET_PROJECTS_BITBUCKET";
+# elif [[ "$PARAM_VCS" = "github" ]]; then eval "$SCRIPT_GET_PROJECTS_GITHUB";
+# elif [[ "$PARAM_VCS" = "gitlab" ]]; then eval "$SCRIPT_GET_PROJECTS_GITLAB";
+# fi
+
+PROJECTS_PAGE=1
+echo "Fetching organization projects - Page #$PROJECTS_PAGE" | tee -a fetch-projects.log
+
+curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID" -H "Circle-Token: ${!PARAM_CIRCLE_TOKEN}" > projects-list-page-"$PROJECTS_PAGE".json
+
+PAGE_TOKEN=$(jq -r '.next_page_token' projects-page-$PROJECTS_PAGE.json)
+
+if [[ $(jq '.items|length' projects-page-$PROJECTS_PAGE.json) -gt 0 ]]; then
+    echo -e "Found $(jq '.items|length' projects-page-$PROJECTS_PAGE.json) project(s)\n" | tee -a fetch-projects.log
+    jq -r '.items[]|.name +";" +.slug' projects-page-$PROJECTS_PAGE.json >> projects-array-like-list.txt
+else
+    printf "Organization '%s' doesn't have any projects in CircleCI \n\n" "$ORG_NAME" | tee -a fetch-projects.log
+fi
+
+if [[ "$PAGE_TOKEN" != "null" ]]; then
+    while [[ "$PAGE_TOKEN" != "null" ]]
+      do
+        ((PROJECTS_PAGE++))
+        echo "Fetching organization projects - Page #$PROJECTS_PAGE" | tee -a fetch-projects.log
+        curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID&page-token=$PAGE_TOKEN" -H "circle-token: ${!PARAM_CIRCLE_TOKEN}" > projects-list-page-"$PROJECTS_PAGE".json
+        echo -e "Found $(jq '.items|length' projects-page-"$PROJECTS_PAGE".json) project(s)\n" | tee -a fetch-projects.log
+        jq -r '.items[]|.name +";" +.slug' projects-page-"$PROJECTS_PAGE".json >> projects-array-like-list.txt
+        PAGE_TOKEN=$(jq -r '.next_page_token' project-env-vars-API-response.json)
+    done
+fi
+
+
 echo '{"projects": []}' > all-projects-report.json
 
-#### These scripts will produce a 'projects-array-like-list.txt' file.
-#### Each line of the file is a project's name and its slug, separated by a ';' (semi-colon).
-if [[ "$PARAM_VCS" = "bitbucket" ]]; then eval "$SCRIPT_GET_PROJECTS_BITBUCKET";
-elif [[ "$PARAM_VCS" = "github" ]]; then eval "$SCRIPT_GET_PROJECTS_GITHUB";
-elif [[ "$PARAM_VCS" = "gitlab" ]]; then eval "$SCRIPT_GET_PROJECTS_GITLAB";
-fi
 
 if [[ -s projects-array-like-list.txt ]]; then
   #### Populating the report JSON file with names and slugs of all identified projects for the organization.
@@ -22,3 +50,5 @@ else
   echo -e "No projects found for organization '$PARAM_ORG_NAME'."
 fi
 
+#### Clean-up
+rm -f projects-list-page-*.json
