@@ -28,7 +28,7 @@ if [ -s projects-array-like-list.txt ]; then
         fi
   #### Search for Additional SSH keys
         curl -s -G "https://circleci.com/api/v1.1/project/$PROJECT_SLUG/settings" -H "circle-token: ${!PARAM_CIRCLE_TOKEN}" > project-settings-API-response.json
-        if [[ $(jq '.ssh_keys | length' project-settings-API-response.json.json) -gt 0 ]]; then
+        if [[ $(jq '.ssh_keys | length' project-settings-API-response.json) -gt 0 ]]; then
           #### Saving response of this API call to use in later search for third-party integrations secxrets.
           cp project-settings-API-response.json project-settings-"$PROJECT_FILENAME".json
           jq '.ssh_keys' project-settings-API-response.json > extra-ssh-"$PROJECT_FILENAME".json
