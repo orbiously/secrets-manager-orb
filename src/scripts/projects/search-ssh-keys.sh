@@ -27,12 +27,14 @@ if [ -s projects-array-like-list.txt ]; then
           echo "$(jq --arg PROJECT "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .checkout_keys |= .' all-projects-report.json)" > all-projects-report.json
         fi
   #### Search for Additional SSH keys
-      # Using the JSON file generated when fetching the list of projects
-        if [[ $(jq '.ssh_keys | length' project-settings-API-response-"$PROJECT_FILENAME".json) -gt 0 ]]; then
-          jq '.ssh_keys' project-settings-API-response-"$PROJECT_FILENAME".json > extra-ssh-and-integrations-"$PROJECT_FILENAME".json
+        curl -s -G "https://circleci.com/api/v1.1/project/$PROJECT_SLUG/settings" -H "circle-token: ${!PARAM_CIRCLE_TOKEN}" > project-settings-API-response.json
+        if [[ $(jq '.ssh_keys | length' project-settings-API-response.json.json) -gt 0 ]]; then
+          #### Saving response of this API call to use in later search for third-party integrations secxrets.
+          cp project-settings-API-response.json project-settings-"$PROJECT_FILENAME".json
+          jq '.ssh_keys' project-settings-API-response.json > extra-ssh-"$PROJECT_FILENAME".json
           #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
-          echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .additional_ssh |= . + input' all-projects-report.json extra-ssh-and-integrations-"$PROJECT_FILENAME".json)" > all-projects-report.json
-          echo -e "Project '$PROJECT_NAME' has $(jq '. | length' extra-ssh-and-integrations-"$PROJECT_FILENAME".json) Additional SSH key(s)." | tee -a projects-ssh-keys.log
+          echo "$(jq --arg PROJECT_NAME "$PROJECT_NAME" '(.projects[] | select(.name == "'"$PROJECT_NAME"'")) .additional_ssh |= . + input' all-projects-report.json extra-ssh-"$PROJECT_FILENAME".json)" > all-projects-report.json
+          echo -e "Project '$PROJECT_NAME' has $(jq '. | length' extra-ssh-"$PROJECT_FILENAME".json) Additional SSH key(s)." | tee -a projects-ssh-keys.log
         else
           echo -e "There are no Additional SSH keys in project '$PROJECT_NAME'."  | tee -a projects-ssh-keys.log
           #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
@@ -43,12 +45,9 @@ if [ -s projects-array-like-list.txt ]; then
   done < projects-array-like-list.txt
 
   #### Clean-up
+  rm -f project-settings-API-response.json
   rm -f checkout-keys-*.json
-  rm -f extra-ssh-and-integrations-"$PROJECT_FILENAME".json
-
-  #### Temporarily deleting these files in the clean-up.
-  #### Will remove this last command when implementing search for secrets in Jira and legacy integrations.
-  rm -f project-settings-API-response-"$PROJECT_FILENAME".json
+  rm -f extra-ssh-*.json
 
 else
   echo "No projects to search in." | tee -a projects-env-vars.log
