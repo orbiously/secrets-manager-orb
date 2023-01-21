@@ -66,7 +66,7 @@ steps:
         # SCRIPT_GET_PROJECTS_BITBUCKET: << include(scripts/bitbucket/get-bitbucket-projects.sh) >>
         # SCRIPT_GET_PROJECTS_GITLAB: << include(scripts/gitlab/get-gitlab-projects.sh) >>
       name: Listing organization projects
-      command: <<include(scripts/get-projects.sh)>>
+      command: <<include(scripts/projects/get-projects.sh)>>
 
   - when:
       condition: << parameters.search-projects-env-vars >>
