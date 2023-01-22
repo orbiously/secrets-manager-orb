@@ -8,7 +8,7 @@
 # fi
 
 PROJECTS_PAGE=1
-echo "Fetching organization projects... | tee -a fetch-projects.log
+echo "Fetching organization projects..." | tee -a fetch-projects.log
 
 curl -s -G "https://circleci.com/api/private/project?organization-id=$ORG_ID" -H "Circle-Token: ${!PARAM_CIRCLE_TOKEN}" > projects-list-page-"$PROJECTS_PAGE".json
 
@@ -50,16 +50,18 @@ if [[ -s potential-projects-array-like-list.txt ]]; then
       cp project-settings-API-response.json project-settings-"$PROJECT_FILENAME".json
 
       
-      if [[ "$PARAM_VCS" == "github" || "$PARAM_VCS" == "bitbucket" ]] then
+      if [[ "$PARAM_VCS" == "github" || "$PARAM_VCS" == "bitbucket" ]]; then
         if [[ $(jq '.branches|length' project-settings-API-response.json) -gt 0 ]]; then
-          echo $PROJECT >> projects-array-like-list.txt
+          echo "$PROJECT" >> projects-array-like-list.txt
         fi
-      else
-        #### For GitLab organizations the '/private/project?organization-id=***' only returns projects that were explicitly set up in CircleCI.
-        #### So there is no need to filter out.
-        cp potential-projects-array-like-list.txt projects-array-like-list.txt
       fi        
   done < potential-projects-array-like-list.txt
+
+  #### For GitLab organizations the '/private/project?organization-id=***' only returns projects that were explicitly set up in CircleCI.
+  #### So there is no need to filter out.
+  if [[ "$PARAM_VCS" == "gitlab" ]]; then
+    cp potential-projects-array-like-list.txt projects-array-like-list.txt
+  fi
 fi
 
 echo '{"projects": []}' > all-projects-report.json
@@ -75,6 +77,7 @@ if [[ -s projects-array-like-list.txt ]]; then
   done < projects-array-like-list.txt
 else
   echo -e "No projects found for organization '$PARAM_ORG_NAME'."
+  #### The below 'echo' triggers the 'SC2005' ShellCheck error but it's the only way I found to use the same file as both input and output of the `jq` command.
   echo "$(jq '.projects = null' all-projects-report.json)" > all-projects-report.json
 fi
 
