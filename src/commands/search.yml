@@ -59,7 +59,7 @@ steps:
 
   - run:
       environment:
-        # PARAM_VCS: << parameters.vcs >>
+        PARAM_VCS: << parameters.vcs >>
         PARAM_CIRCLE_TOKEN: << parameters.circle-token >>
         PARAM_ORG_NAME: << parameters.org-name >>
         # SCRIPT_GET_PROJECTS_GITHUB: << include(scripts/github/get-github-projects.sh) >>
